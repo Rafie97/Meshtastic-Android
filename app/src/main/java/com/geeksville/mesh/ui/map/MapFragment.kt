@@ -4,12 +4,16 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -65,6 +69,13 @@ import com.geeksville.mesh.waypoint
 import com.google.accompanist.themeadapter.appcompat.AppCompatTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import java.net.HttpURLConnection
+import java.net.URL
+import java.io.OutputStreamWriter
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.HttpMethod
+import kotlinx.coroutines.runBlocking
 import org.osmdroid.bonuspack.utils.BonusPackHelper.getBitmapFromVectorDrawable
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -151,6 +162,8 @@ fun MapView(
     val hasGps = context.hasGps()
 
     val map = rememberMapViewWithLifecycle(context)
+
+    var isPinging = false
 
     fun MapView.toggleMyLocation() {
         if (context.gpsDisabled()) {
@@ -566,6 +579,60 @@ fun MapView(
         dialog.show()
     }
 
+    suspend fun httpReq () {
+        // 10.21.0.1
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        builder
+            .setMessage("I am the message")
+            .setTitle("I am the title")
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+        try {
+            val url = URL("10.21.0.1:3000/invoke")
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "POST"
+            connection.doOutput = true // Enable output stream for sending data
+
+            // Set headers if needed
+            connection.setRequestProperty("Content-Type", "application/json")
+
+            // Send data
+            val postData = "id=CC4HACY4GBY2UTBN6UCJDR4LPAZ5IS5C5JUUWLZSQ4WMQBZ4LFV62FAG&sourceAccount=alice&value=[[-42,-42]]&key=hello"
+            OutputStreamWriter(connection.outputStream).use {
+                it.write(postData)
+                it.flush()
+            }
+
+            // Get response code
+            val responseCode = connection.responseCode
+            println("Response Code: $responseCode")
+
+            // Read response
+            val inputStream = if (responseCode < 400) connection.inputStream else connection.errorStream
+            val response = inputStream.bufferedReader().use { it.readText() }
+            println("Response Body: $response")
+
+            // Disconnect
+            connection.disconnect()
+        }
+        catch (e: Exception) {
+            Log.e("Error", "Failed to send HTTP request", e)
+        }
+    }
+
+    fun pingMyLocation() = runBlocking {
+        if(isPinging) {
+            isPinging = false
+        }
+        else {
+
+
+            isPinging = true
+            httpReq()
+        }
+    }
+
     fun showCacheManagerDialog() {
         MaterialAlertDialogBuilder(context)
             .setTitle(R.string.map_offline_manager)
@@ -653,6 +720,11 @@ fun MapView(
                     onClick = { showMapStyleDialog() },
                     drawableRes = R.drawable.ic_twotone_layers_24,
                     contentDescription = R.string.map_style_selection,
+                )
+                IconButton(
+                    onClick = { pingMyLocation() },
+                    drawableRes = R.drawable.ic_twotone_people_24,
+                    contentDescription = "Ping my location",
                 )
                 IconButton(
                     onClick = {

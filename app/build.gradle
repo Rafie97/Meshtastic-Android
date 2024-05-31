@@ -160,6 +160,9 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
     implementation 'androidx.datastore:datastore:1.1.1'
 
+    // Ktor
+    implementation("io.ktor:ktor-server-default-headers:2.3.11")
+    implementation("io.ktor:ktor-client-core:2.3.11")
     // Lifecycle
     def lifecycle_version = '2.7.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
@@ -169,7 +172,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
-
     // Room
     def room_version = '2.6.1'
     implementation "androidx.room:room-runtime:$room_version"
