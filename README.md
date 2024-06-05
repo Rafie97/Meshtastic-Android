@@ -1,4 +1,4 @@
-### A copy of the Meshtastic Android app with functionality to set a life alert ping to the user's location publicly to a Web3 blockchain. 
+### A copy of the Meshtastic Android app with functionality to set a life alert ping to the user's location publicly on the map and to a Web3 blockchain. For the use of neighbor rescue alerts and in cases of disasters or war. Holds a public immutable record of locations and times for investigation. 
 
 
 <p align="center">
