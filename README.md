@@ -1,3 +1,6 @@
+### A copy of the Meshtastic Android app with functionality to set a life alert ping to the user's location publicly to a Web3 blockchain. 
+
+
 <p align="center">
   <a href=""><img width="200" height="200" src="https://github.com/meshtastic/Meshtastic-Android/blob/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher2.png"></a>
 </p>
